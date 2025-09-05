@@ -1,34 +1,111 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useRef, useEffect } from 'react'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [messages, setMessages] = useState([
+    { id: 1, text: "SYSTEM ONLINE. ArcadeBot v1.0 ready for communication! ⚡", sender: 'bot' }
+  ])
+  const [inputValue, setInputValue] = useState('')
+  const [isTyping, setIsTyping] = useState(false)
+  const messagesEndRef = useRef(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  const botResponses = [
+    "PROCESSING... That's a great question! ⚡",
+    "SYSTEM RESPONSE: Excellent thinking pattern detected! 🎯",
+    "ARCADE MODE: That reminds me of classic gameplay! 🕹️",
+    "HIGH SCORE: You've got the spirit of a true gamer! 🏆",
+    "LEVEL UP: That's some next-level thinking! 🚀",
+    "GAME ON: I love your arcade energy! 🎮",
+    "PLAYER 1: You're speaking my language! 🌟",
+    "BOSS BATTLE: That's champion-level thinking! ⚔️",
+    "CONTINUE: You've got the heart of a true arcade master! 🎯",
+    "EXTRA LIFE: That's what I call high-score thinking! 🎪",
+    "POWER-UP: I'm getting energized just thinking about it! ⚡",
+    "BONUS POINTS: That's a question worth 1000 points! 🎮",
+    "SOUND ON: I can almost hear the classic arcade sounds! 🔊",
+    "COIN INSERTED: You're thinking like a true arcade champion! 🪙",
+    "GAME OVER: Just kidding! That's some next-level gameplay! 🎲"
+  ]
+
+  const handleSendMessage = async () => {
+    if (!inputValue.trim()) return
+
+    const userMessage = { id: Date.now(), text: inputValue, sender: 'user' }
+    setMessages(prev => [...prev, userMessage])
+    setInputValue('')
+    setIsTyping(true)
+
+    // Simulate bot typing delay
+    setTimeout(() => {
+      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)]
+      const botMessage = { id: Date.now() + 1, text: randomResponse, sender: 'bot' }
+      setMessages(prev => [...prev, botMessage])
+      setIsTyping(false)
+    }, 1000 + Math.random() * 2000)
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSendMessage()
+    }
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="game-container">
+      <div className="game-header">
+        <h1 className="game-title">⚡ ARCADE CHAT ⚡</h1>
+        <div className="game-subtitle">Classic Gaming Terminal</div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      
+      <div className="chat-container">
+        <div className="chat-messages">
+          {messages.map((message) => (
+            <div key={message.id} className={`message ${message.sender}`}>
+              <div className="message-content">
+                {message.text}
+              </div>
+            </div>
+          ))}
+          {isTyping && (
+            <div className="message bot">
+              <div className="message-content typing">
+                <span className="typing-dots">●</span>
+                <span className="typing-dots">●</span>
+                <span className="typing-dots">●</span>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+        
+        <div className="chat-input-container">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Type your message here, player..."
+            className="chat-input"
+          />
+          <button onClick={handleSendMessage} className="send-button">
+            SEND
+          </button>
+        </div>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+      
+      <div className="game-footer">
+        <div className="pixel-border"></div>
+        <div className="footer-text">GAME ON! Insert coin to continue! 🪙</div>
+      </div>
+    </div>
   )
 }
 
