@@ -1,5 +1,5 @@
 # Files
-service/secret.txt
+service/.env
 
 # Logs
 logs

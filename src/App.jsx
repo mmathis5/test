@@ -43,13 +43,29 @@ function App() {
     setInputValue('')
     setIsTyping(true)
 
-    // Simulate bot typing delay
-    setTimeout(() => {
+    try {
+      const response = await fetch('/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: inputValue }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const botMessage = { id: Date.now() + 1, text: data.message, sender: 'bot' }
+        setMessages(prev => [...prev, botMessage])
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      // Fallback to random response if server fails
       const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)]
       const botMessage = { id: Date.now() + 1, text: randomResponse, sender: 'bot' }
       setMessages(prev => [...prev, botMessage])
-      setIsTyping(false)
-    }, 1000 + Math.random() * 2000)
+    }
+    
+    setIsTyping(false)
   }
 
   const handleKeyPress = (e) => {
